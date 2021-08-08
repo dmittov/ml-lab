@@ -5,11 +5,3 @@ terraform {
     prefix = "terraform/state"
   }
 }
-
-data "terraform_remote_state" "main-state" {
-  backend = "gcs"
-  config = {
-    bucket = google_storage_bucket.tf-state.name
-    prefix = "main"
-  }
-}
