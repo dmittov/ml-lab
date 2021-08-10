@@ -1,5 +1,21 @@
+provider "google" {
+  project = var.project
+  region  = var.region
+}
+
+data "terraform_remote_state" "persistent" {
+  backend = "gcs"
+  config = {
+    bucket = "dmittov-tf-state"
+    prefix = "terraform/persistent"
+  }
+}
+
+data "google_client_config" "default" {
+}
+
 locals {
-  cluster_zone = "${data.google_client_config.default.region}-b"
+  cluster_zone = "${data.google_client_config.default.region}-${var.zone}"
 }
 
 resource "google_container_cluster" "kube" {
@@ -22,7 +38,7 @@ resource "google_container_cluster" "kube" {
     # micro: 1GB
     machine_type = "e2-medium"
 
-    service_account = google_service_account.default.email
+    service_account = data.terraform_remote_state.persistent.outputs.service_account.email
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
@@ -36,6 +52,7 @@ resource "google_container_cluster" "kube" {
 
 # additional node pool example
 resource "google_container_node_pool" "additional_preemptible_nodes" {
+  count = 0
   name       = "additional-node-pool"
   location   = local.cluster_zone
   cluster    = google_container_cluster.kube.name
@@ -44,7 +61,7 @@ resource "google_container_node_pool" "additional_preemptible_nodes" {
     preemptible  = true
     machine_type = "e2-medium"
 
-    service_account = google_service_account.default.email
+    service_account = data.terraform_remote_state.persistent.outputs.service_account.email
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
