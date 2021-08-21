@@ -11,7 +11,7 @@ resource "google_service_account" "default" {
 }
 
 resource "google_storage_bucket" "datasets" {
-  name                        = var.dataset_bucket
+  name                        = "${var.bucket_prefix}-datasets"
   location                    = data.google_client_config.default.region
   project                     = data.google_client_config.default.project
   force_destroy               = false
@@ -19,7 +19,7 @@ resource "google_storage_bucket" "datasets" {
 }
 
 resource "google_storage_bucket" "tf-state" {
-  name                        = var.state_bucket
+  name                        = "${var.bucket_prefix}-tf-state"
   location                    = data.google_client_config.default.region
   project                     = data.google_client_config.default.project
   force_destroy               = false
@@ -27,4 +27,12 @@ resource "google_storage_bucket" "tf-state" {
   versioning {
     enabled = true
   }
+}
+
+resource "google_storage_bucket" "spark" {
+  name                        = "${var.bucket_prefix}-spark"
+  location                    = data.google_client_config.default.region
+  project                     = data.google_client_config.default.project
+  force_destroy               = false
+  uniform_bucket_level_access = true
 }

@@ -4,7 +4,7 @@ variable "region" {
 variable "project" {
     type = string
 }
-variable "dataset_bucket" {
+
+variable "bucket_prefix" {
     type = string
 }
-
