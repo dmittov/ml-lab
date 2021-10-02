@@ -21,11 +21,6 @@ spec:
           image: gcr.io/ml-lab-324709/aria2
           command: ["/bin/bash", "-c", "--"]
           args: ["while true; do sleep 3600; done;"]
-          securityContext:
-            privileged: true
-            capabilities:
-              add:
-                - SYS_ADMIN
           volumeMounts:
             - name: data
               mountPath: /data
@@ -36,13 +31,6 @@ spec:
             limits:
               memory: "8Gi"
               cpu: "3900m"
-          lifecycle:
-            postStart:
-              exec:
-                command: ["gcsfuse", "ml-lab-324709-datasets", "/mnt"]
-            preStop:
-              exec:
-                command: ["fusermount", "-u", "/mnt"]
       volumes:
         - name: data
           persistentVolumeClaim:
