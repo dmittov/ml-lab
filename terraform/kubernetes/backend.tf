@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "dmittov-tf-state"
+    bucket = "ml-lab-324709-tf-state"
     prefix = "terraform/kubernetes"
   }
 }

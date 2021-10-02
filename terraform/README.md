@@ -1,5 +1,12 @@
 # Deploy the Infrastructure
 
+## Login
+
+```bash
+gcloud auth application-default login
+```
+
+
 ## Persistent infra
 
 ```bash

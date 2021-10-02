@@ -1,7 +1,7 @@
 terraform {
   backend "gcs" {
     # variables are not allowed in backend
-    bucket = "dmittov-tf-state"
+    bucket = "ml-lab-324709-tf-state"
     prefix = "terraform/persistent"
   }
 }
