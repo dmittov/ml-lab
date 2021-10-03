@@ -41,16 +41,16 @@ resource "google_service_account" "k8s_spark" {
 
 resource "google_project_iam_member" "k8s_spark_roles" {
   for_each = toset(local.k8s_roles)
-  project = var.project
+  project  = var.project
   role     = each.value
-  member = "serviceAccount:${google_service_account.k8s_spark.email}"
+  member   = "serviceAccount:${google_service_account.k8s_spark.email}"
 }
 
 resource "google_project_iam_member" "gke_account_roles" {
   for_each = toset(local.gke_roles)
-  project = var.project
+  project  = var.project
   role     = each.value
-  member = "serviceAccount:${google_service_account.gke_account.email}"
+  member   = "serviceAccount:${google_service_account.gke_account.email}"
 }
 
 resource "google_container_cluster" "kube" {
@@ -65,6 +65,12 @@ resource "google_container_cluster" "kube" {
 
   # GPUs/TPUs are not available for autopilot clusters
   enable_autopilot = false
+
+  # Regular channel is still 1.20 in europe-west-1
+  # Ephemeral volumes I need come from 1.21
+  release_channel {
+    channel = "RAPID"
+  }
 
   # Separately managed node pool is preferred, but it's not compatible
   # with no-autopilot
@@ -82,6 +88,32 @@ resource "google_container_cluster" "kube" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
+  }
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
+  }
+}
+
+# primary node pool example
+resource "google_container_node_pool" "primary_pool" {
+  name               = "primary-node-pool"
+  location           = local.cluster_zone
+  cluster            = google_container_cluster.kube.name
+  initial_node_count = 0
+  node_config {
+    preemptible  = true
+    machine_type = "e2-medium"
+
+    service_account = google_service_account.gke_account.email
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+  }
+  autoscaling {
+    min_node_count = 0
+    max_node_count = 3
   }
   timeouts {
     create = "10m"
