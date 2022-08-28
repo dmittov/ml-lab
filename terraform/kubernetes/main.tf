@@ -18,7 +18,10 @@ locals {
   cluster_zone = "${data.google_client_config.default.region}-${var.zone}"
   gke_roles    = ["roles/editor"]
   k8s_roles    = ["roles/storage.admin"]
-  apis         = ["container.googleapis.com", "cloudbuild.googleapis.com"]
+  apis         = [
+    "container.googleapis.com",
+    "cloudbuild.googleapis.com",
+  ]
 }
 
 resource "google_project_service" "apis" {
