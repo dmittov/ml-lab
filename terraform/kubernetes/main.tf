@@ -1,17 +1,12 @@
-provider "google" {
-  project = var.project
-  region  = var.region
+data "google_client_config" "default" {
 }
 
 data "terraform_remote_state" "persistent" {
   backend = "gcs"
   config = {
-    bucket = "${var.project}-tf-state"
+    bucket = "${data.google_client_config.default.project}-tf-state"
     prefix = "terraform/persistent"
   }
-}
-
-data "google_client_config" "default" {
 }
 
 locals {
@@ -23,7 +18,7 @@ locals {
 
 resource "google_project_service" "apis" {
   for_each                   = toset(local.apis)
-  project                    = var.project
+  project                    = data.google_client_config.default.project
   service                    = each.value
   disable_on_destroy         = true
   disable_dependent_services = true
@@ -41,14 +36,14 @@ resource "google_service_account" "k8s_spark" {
 
 resource "google_project_iam_member" "k8s_spark_roles" {
   for_each = toset(local.k8s_roles)
-  project  = var.project
+  project  = data.google_client_config.default.project
   role     = each.value
   member   = "serviceAccount:${google_service_account.k8s_spark.email}"
 }
 
 resource "google_project_iam_member" "gke_account_roles" {
   for_each = toset(local.gke_roles)
-  project  = var.project
+  project  = data.google_client_config.default.project
   role     = each.value
   member   = "serviceAccount:${google_service_account.gke_account.email}"
 }
@@ -63,85 +58,12 @@ resource "google_container_cluster" "kube" {
     google_project_service.apis,
   ]
 
-  # GPUs/TPUs are not available for autopilot clusters
-  enable_autopilot = false
-
-  # Regular channel is still 1.20 in europe-west-1
-  # Ephemeral volumes I need come from 1.21
+  enable_autopilot = true
+  vertical_pod_autoscaling { enabled = true }
   release_channel {
-    channel = "RAPID"
+    channel = "STABLE"
   }
 
-  # Separately managed node pool is preferred, but it's not compatible
-  # with no-autopilot
-  # remove_default_node_pool = true
-  initial_node_count = 1
-  node_config {
-    preemptible = true
-    # cost-optimized instance: 2 shared vCPU (50%, up to 100% for short periods) 
-    # medium: 4GB
-    # small: 2GB
-    # micro: 1GB
-    machine_type = "e2-medium"
-
-    service_account = google_service_account.gke_account.email
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-  }
-  timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
-  }
-}
-
-# primary node pool example
-resource "google_container_node_pool" "primary_pool" {
-  name               = "primary-node-pool"
-  location           = local.cluster_zone
-  cluster            = google_container_cluster.kube.name
-  initial_node_count = 0
-  node_config {
-    preemptible  = true
-    machine_type = "e2-medium"
-
-    service_account = google_service_account.gke_account.email
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-  }
-  autoscaling {
-    min_node_count = 0
-    max_node_count = 3
-  }
-  timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
-  }
-}
-
-# additional node pool example
-resource "google_container_node_pool" "additional_preemptible_nodes" {
-  count              = 1
-  name               = "additional-node-pool"
-  location           = local.cluster_zone
-  cluster            = google_container_cluster.kube.name
-  initial_node_count = 0
-  node_config {
-    preemptible  = true
-    machine_type = "n2d-standard-4"
-
-    service_account = google_service_account.gke_account.email
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-  }
-  autoscaling {
-    min_node_count = 0
-    max_node_count = 3
-  }
   timeouts {
     create = "10m"
     update = "10m"
