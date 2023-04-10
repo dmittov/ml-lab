@@ -50,6 +50,7 @@ resource "google_project_iam_member" "gke_account_roles" {
 
 resource "google_container_cluster" "kube" {
   name = "dl-cluster"
+  location = data.google_client_config.default.region
 
   depends_on = [
     google_service_account.gke_account,
