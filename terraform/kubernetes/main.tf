@@ -50,8 +50,6 @@ resource "google_project_iam_member" "gke_account_roles" {
 
 resource "google_container_cluster" "kube" {
   name = "dl-cluster"
-  # Zonal cluster is good enough and GKE fee is $0
-  location = local.cluster_zone
 
   depends_on = [
     google_service_account.gke_account,
@@ -59,7 +57,11 @@ resource "google_container_cluster" "kube" {
   ]
 
   enable_autopilot = true
-  vertical_pod_autoscaling { enabled = true }
+  vertical_pod_autoscaling {
+    enabled = true
+  }
+  ip_allocation_policy {
+  }
   release_channel {
     channel = "STABLE"
   }
