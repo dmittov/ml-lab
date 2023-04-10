@@ -1,6 +1,11 @@
 # vscode
 .vscode
 
+# Custom
+
+terraform/*/provider.tf
+terraform/*/backend.tf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
