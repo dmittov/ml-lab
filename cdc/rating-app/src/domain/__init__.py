@@ -1,1 +1,1 @@
-from domain.base import Base
+from domain.artist import Base
