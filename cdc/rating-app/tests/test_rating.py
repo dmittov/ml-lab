@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from domain.ratings import Artist
+from domain.artist import Artist
 
 
 @pytest.fixture
@@ -10,56 +10,34 @@ def artist() -> Artist:
 
 
 class TestRating:
-
-    def test_add_artist(self, session: Session, artist: Artist) -> None:
-        session.add(artist)
-        stmt = (
-            select(Artist)
-            .where(Artist.artist_name == artist.artist_name)
-        )
-        rs = session.execute(stmt)
-        found = rs.fetchall()
-        assert len(found) == 1
+    def test_add_artist(self, local_session: Session, artist: Artist) -> None:
+        local_session.add(artist)
+        local_session.commit()
+        assert artist.artist_id is not None
 
     def test_id_is_set(self, session: Session, artist: Artist) -> None:
         session.add(artist)
-        stmt = (
-            select(Artist)
-            .where(Artist.artist_name == artist.artist_name)
-        )
-        found_artist = session.execute(stmt).one()[0]
-        assert found_artist.artist_id is not None
+        session.flush()
+        session.refresh(artist)
+        assert artist.artist_id is not None
 
     def test_created_at(self, session: Session, artist: Artist) -> None:
         session.add(artist)
-        stmt = (
-            select(Artist)
-            .where(Artist.artist_name == artist.artist_name)
-        )
-        found_artist = session.execute(stmt).one()[0]
-        assert found_artist.created_at is not None
+        session.flush()
+        session.refresh(artist)
+        assert artist.created_at is not None
 
     def test_new_updated_at(self, session: Session, artist: Artist) -> None:
         session.add(artist)
-        stmt = (
-            select(Artist)
-            .where(Artist.artist_name == artist.artist_name)
-        )
-        found_artist = session.execute(stmt).one()[0]
-        assert found_artist.updated_dt is None
+        session.flush()
+        session.refresh(artist)
+        assert artist.updated_at == artist.created_at 
 
-    def test_upd_updated_at(self, session: Session, artist: Artist) -> None:
-        session.add(artist)
-        stmt = (
-            select(Artist)
-            .where(Artist.artist_name == artist.artist_name)
-        )
-        artist = session.execute(stmt).one()[0]
+    def test_upd_updated_at(self, 
+                            local_session: Session, 
+                            artist: Artist) -> None:
+        local_session.add(artist)
+        local_session.commit()
         artist.artist_name = "May, Derrick"
-        session.add(artist)
-        stmt = (
-            select(Artist)
-            .where(Artist.artist_name == artist.artist_name)
-        )
-        found_artist = session.execute(stmt).one()[0]
-        assert found_artist.updated_dt is not None
+        local_session.commit()
+        assert artist.updated_at > artist.created_at
