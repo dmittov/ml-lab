@@ -16,9 +16,9 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from domain import ratings
+from domain import Base
 target_metadata = [
-    ratings.Base.metadata,
+    Base.metadata,
 ]
 # target_metadata = None
 
