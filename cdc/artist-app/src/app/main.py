@@ -15,6 +15,9 @@ def create_app() -> FastAPI:
     @app.get("/artist/{artist_id}", response_model=schema.Artist)
     async def get_user(artist_id: int) -> data.Artist:
         artist = db.session.query(data.Artist).get(artist_id)
+        if artist is None:
+            raise HTTPException(status_code=404, 
+                                detail="No artist with id [{artist_id}] found")
         return artist
 
 
@@ -37,6 +40,15 @@ def create_app() -> FastAPI:
         db_artist.artist_name = artist.artist_name
         db.session.commit()
         return db_artist
+
+
+    @app.delete("/artist/{artist_id}", response_model=schema.Artist)
+    async def delete_artist(artist_id: int) -> data.Artist:
+        db_artist = db.session.query(data.Artist).get(artist_id)
+        db.session.delete(db_artist)
+        db.session.commit()
+        return db_artist
+
 
     return app
 
