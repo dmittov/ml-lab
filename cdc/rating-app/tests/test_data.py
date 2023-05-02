@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.orm import Session
-from sqlalchemy import select
-from domain.artist import Artist
+from domain.data import Artist
+from sqlalchemy import Column
 
 
 @pytest.fixture
@@ -9,7 +9,7 @@ def artist() -> Artist:
     return Artist(artist_name="Derrick May")
 
 
-class TestRating:
+class TestArtist:
     def test_add_artist(self, local_session: Session, artist: Artist) -> None:
         local_session.add(artist)
         local_session.commit()

@@ -4,10 +4,11 @@ import testing.postgresql
 from sqlalchemy import create_engine
 from sqlalchemy import Engine
 from sqlalchemy.orm import Session
+from typing import Generator
 
 
 @pytest.fixture(scope="session")
-def engine() -> Engine:
+def engine() -> Generator[Engine, None, None]:
     with testing.postgresql.Postgresql() as pg:
         alembic_cfg = config.Config()
         alembic_cfg.set_main_option("script_location", "src:alembic")
@@ -18,7 +19,7 @@ def engine() -> Engine:
 
 
 @pytest.fixture
-def local_engine() -> Engine:
+def local_engine() -> Generator[Engine, None, None]:
     """Significant performance overhead, pls use only when performing commits
     in tests"""
     with testing.postgresql.Postgresql() as pg:
@@ -31,14 +32,14 @@ def local_engine() -> Engine:
 
 
 @pytest.fixture
-def local_session(local_engine: Engine) -> Session:
+def local_session(local_engine: Engine) -> Generator[Session, None, None]:
     with Session(local_engine) as session:
         yield session
-        session.rollback()
+        session.commit()
 
 
 @pytest.fixture
-def session(engine: Engine) -> Session:
+def session(engine: Engine) -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
         session.rollback()
