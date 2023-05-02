@@ -21,7 +21,7 @@ class TestApp:
     def test_app_runs(self, client) -> None:
         assert client.app is not None
 
-    def test_get_artist(self,
+    def test_get_existing_artist(self,
                         mocker: MockerFixture,
                         client: TestClient) -> None:
         artist_id = 1
@@ -31,9 +31,17 @@ class TestApp:
                 created_at=datetime.datetime.now(),
                 updated_at=datetime.datetime.now(),
             )
-        with mocker.patch.object(Query, "get", return_value=expected):
-            response = client.get(f"/artist/{artist_id}")
+        mocker.patch.object(Query, "get", return_value=expected)
+        response = client.get(f"/artist/{artist_id}")
         assert response.status_code == 200
         result = schema.Artist(**response.json())
         assert result.artist_name == expected.artist_name
         assert result.artist_id == expected.artist_id
+
+    def test_get_not_existing_artist(self,
+                        mocker: MockerFixture,
+                        client: TestClient) -> None:
+        artist_id = 1
+        mocker.patch.object(Query, "get", return_value=None)
+        response = client.get(f"/artist/{artist_id}")
+        assert response.status_code == 404
