@@ -45,8 +45,9 @@ def create_app() -> FastAPI:
     @app.delete("/artist/{artist_id}", response_model=schema.Artist)
     async def delete_artist(artist_id: int) -> data.Artist:
         db_artist = db.session.query(data.Artist).get(artist_id)
-        db.session.delete(db_artist)
-        db.session.commit()
+        if db_artist is not None:
+            db.session.delete(db_artist)
+            db.session.commit()
         return db_artist
 
 
