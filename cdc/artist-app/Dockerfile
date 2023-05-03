@@ -31,7 +31,7 @@ RUN pip install --upgrade pip && \
     pip install -U -r requirements-tests.txt
 COPY ./ .
 
-# python -m bandit src/
+# python -m bandit -r src/
 # python -m pytest -n auto --cov
 
 ##### Default image
