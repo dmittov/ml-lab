@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi_sqlalchemy import DBSessionMiddleware
-from app import artist
+from app.routers import artist
 import os
 
 
