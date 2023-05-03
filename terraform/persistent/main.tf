@@ -31,3 +31,10 @@ resource "google_storage_bucket" "spark" {
   force_destroy               = false
   uniform_bucket_level_access = true
 }
+
+resource "google_artifact_registry_repository" "docker-main" {
+  location      = data.google_client_config.default.region
+  repository_id = "main"
+  description   = "main docker repository"
+  format        = "DOCKER"
+}
