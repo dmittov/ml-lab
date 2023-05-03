@@ -24,7 +24,7 @@ def engine() -> Generator[Engine, None, None]:
 
 
 @pytest.fixture
-def local_engine() -> Generator[Engine, None, None]:
+def function_engine() -> Generator[Engine, None, None]:
     """Significant performance overhead, pls use only when performing commits
     in tests"""
     with testing.postgresql.Postgresql() as pg:
@@ -37,8 +37,8 @@ def local_engine() -> Generator[Engine, None, None]:
 
 
 @pytest.fixture
-def local_session(local_engine: Engine) -> Generator[Session, None, None]:
-    with Session(local_engine) as session:
+def function_session(function_engine: Engine) -> Generator[Session, None, None]:
+    with Session(function_engine) as session:
         yield session
         session.commit()
 

@@ -9,9 +9,9 @@ def artist() -> Artist:
 
 
 class TestArtist:
-    def test_add_artist(self, local_session: Session, artist: Artist) -> None:
-        local_session.add(artist)
-        local_session.commit()
+    def test_add_artist(self, function_session: Session, artist: Artist) -> None:
+        function_session.add(artist)
+        function_session.commit()
         assert artist.artist_id is not None
 
     def test_id_is_set(self, session: Session, artist: Artist) -> None:
@@ -33,10 +33,10 @@ class TestArtist:
         assert artist.updated_at == artist.created_at 
 
     def test_upd_updated_at(self, 
-                            local_session: Session, 
+                            function_session: Session, 
                             artist: Artist) -> None:
-        local_session.add(artist)
-        local_session.commit()
+        function_session.add(artist)
+        function_session.commit()
         artist.artist_name = "May, Derrick"
-        local_session.commit()
+        function_session.commit()
         assert artist.updated_at > artist.created_at
