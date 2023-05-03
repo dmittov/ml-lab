@@ -1,0 +1,4 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "europe-west1-docker.pkg.dev/ml-lab-324709/main/artist-app", "."]
+images: ["europe-west1-docker.pkg.dev/ml-lab-324709/main/artist-app:latest"]
