@@ -1,7 +1,6 @@
 import pytest
 from sqlalchemy.orm import Session
 from domain.data import Artist
-from sqlalchemy import Column
 
 
 @pytest.fixture
