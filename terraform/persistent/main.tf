@@ -1,8 +1,3 @@
-provider "google" {
-  project = var.project
-  region  = var.region
-}
-
 data "google_client_config" "default" {}
 
 resource "google_service_account" "default" {
