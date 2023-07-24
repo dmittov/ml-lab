@@ -1,0 +1,11 @@
+apiVersion: v2
+name: mlflow
+description: An Customized MLflow Helm chart for Kubernetes
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+
+dependencies:
+  - name: mlflow
+    repository: https://community-charts.github.io/helm-charts
+    version: 0.7.19

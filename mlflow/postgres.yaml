@@ -1,0 +1,79 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mlflow
+---
+apiVersion: v1
+metadata:
+  name: super-secret
+  namespace: mlflow
+data:
+  username: cG9zdGdyZXM=
+  password: cGFzc3dvcmQ=
+kind: Secret
+type: kubernetes.io/basic-auth
+---
+apiVersion: v1
+metadata:
+  name: app-secret
+  namespace: mlflow
+data:
+  username: cGd1c2Vy
+  password: cGFzc3dvcmQ=
+kind: Secret
+type: kubernetes.io/basic-auth
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg-mlflow
+  namespace: mlflow
+spec:
+  instances: 1
+
+  serviceAccountTemplate:
+    metadata:
+      annotations:
+        iam.gke.io/gcp-service-account: postgres-backup@ml-lab-324709.iam.gserviceaccount.com
+
+  backup:
+    barmanObjectStore:
+      destinationPath: "gs://ml-lab-324709-postgres/mlflow"
+      googleCredentials:
+        gkeEnvironment: true
+      wal:
+        compression: snappy
+    retentionPolicy: "30d"
+
+  superuserSecret:
+    name: super-secret
+
+  bootstrap:
+    recovery:
+      backup:
+        name: clusterBackup
+    initdb:
+      database: db
+      owner: pguser
+      secret:
+        name: app-secret
+
+  env:
+  - name: TZ
+    value: Etc/UTC
+
+  storage:
+    size: 1Gi
+
+  postgresql:
+    parameters:
+      # wal_level: "logical"
+      max_wal_senders: "1"
+      max_replication_slots: "1"
+      # listen_addresses: "*"
+    pg_hba:
+      - host all all 10.0.0.0/8 trust
+
+  monitoring:
+    enablePodMonitor: true

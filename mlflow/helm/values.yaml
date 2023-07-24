@@ -1,0 +1,33 @@
+pg:
+  storage: 1Gi
+  gke:
+    use: false
+  backup:
+    destination: s3://pg-backup
+    type: minio
+    action: create
+  # gke install
+  # ...
+
+mlflow:
+  replicaCount: 1
+  backendStore:
+    databaseMigration: true
+    databaseConnectionCheck: true
+    postgres:
+      enabled: true
+      host: mlflow-rw
+      port: 5432
+      database: db
+      user: pguser
+      password: pgpasswd
+  artifactRoot:
+      proxiedArtifactStorage: true
+      # local minio
+      s3:
+        enabled: true
+        localPath: /Users/dmitry/Documents/ml-lab/mlflow/s3-data
+        bucket: mlflow
+        path: /
+        awsAccessKeyId: awsAccessKeyId
+        awsSecretAccessKey: awsSecretAccessKey

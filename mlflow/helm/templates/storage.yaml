@@ -1,0 +1,91 @@
+{{- if $.Values.mlflow.artifactRoot.s3.enabled -}}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-creds
+  labels:
+    app: minio
+    namespace: {{ .Release.Namespace | quote }}
+type: Opaque
+data:
+  accesskey: {{ .Values.mlflow.artifactRoot.s3.awsAccessKeyId | b64enc | quote }}
+  secretkey: {{ .Values.mlflow.artifactRoot.s3.awsSecretAccessKey | b64enc | quote }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: minio
+  name: minio-pod
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  volumes:
+  - name: data-volume
+    persistentVolumeClaim:
+      claimName: data-volume-claim
+  containers:
+  - name: minio
+    env:
+    - name: MINIO_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: minio-creds
+          key: accesskey
+    - name: MINIO_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: minio-creds
+          key: secretkey
+    image: minio/minio:latest
+    command:
+      - minio
+    args:
+      - server
+      - /data
+      - --console-address
+      - ":9001"
+    volumeMounts:
+      - mountPath: /data
+        name: data-volume
+    resources:
+      # MinIO recommends a minimum of 128GB of memory per node 
+      # for best performance.
+      # But here minio is used for the local minikube deployment only
+      # GCS is used for the production deployment
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: 1500m
+        memory: 4Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: minio
+    namespace: {{ .Release.Namespace | quote }}
+spec:
+    selector:
+        app: minio
+    ports:
+        - name: ui-address
+          port: 9000
+          targetPort: 9000
+          protocol: TCP
+        - name: console-address
+          port: 9001
+          targetPort: 9001
+          protocol: TCP
+{{- end -}}
