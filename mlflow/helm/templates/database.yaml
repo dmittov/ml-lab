@@ -27,7 +27,7 @@ stringData:
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-    name: mlflow
+    name: pg-mlflow
     namespace: {{ .Release.Namespace | quote }}
 spec:
     instances: 1
@@ -36,7 +36,7 @@ spec:
     postgresql:
         pg_hba:
         - host all all 10.0.0.0/8 trust
-    {{- if eq true $.Values.pg.gke.use }}
+    {{- if eq "gke" $.Values.pg.backup.type }}
     serviceAccountTemplate:
         metadata:
             annotations:
@@ -58,7 +58,7 @@ spec:
     externalClusters:
         - name: mlflow-backup-cluster
           barmanObjectStore:
-            destinationPath: {{ template "backup.destination" . }}
+            destinationPath: {{ .Values.pg.backup.destination }}
             serverName: mlflow-backup
             {{- if eq "minio" $.Values.pg.backup.type -}}
             endpointURL: http://minio:9000

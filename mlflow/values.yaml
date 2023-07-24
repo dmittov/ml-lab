@@ -1,30 +1,21 @@
 pg:
   storage: 1Gi
   gke:
-    use: false
+    serviceAccount: postgres-backup@ml-lab-324709.iam.gserviceaccount.com
   backup:
-    destination: s3://pg-backup
-    type: minio
-    action: create
+    destination: gs://ml-lab-324709-postgres
+    type: gke
+    serviceAccount: postgres-backup@ml-lab-324709.iam.gserviceaccount.com
+    action: restore
 
 mlflow:
   replicaCount: 1
-  backendStore:
-    databaseMigration: true
-    databaseConnectionCheck: true
-    postgres:
-      enabled: true
-      host: mlflow-rw
-      port: 5432
-      database: db
-      user: pguser
-      password: pgpasswd
+  serviceAccount:
+    create: false
+    annotations:
+      iam.gke.io/gcp-service-account: mlflow@ml-lab-324709.iam.gserviceaccount.com
   artifactRoot:
-      proxiedArtifactStorage: true
-      # local minio
-      s3:
+      gcs:
         enabled: true
-        bucket: mlflow
+        bucket: ml-lab-324709-mlflow
         path: /
-        awsAccessKeyId: awsAccessKeyId
-        awsSecretAccessKey: awsSecretAccessKey

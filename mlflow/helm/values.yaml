@@ -5,9 +5,7 @@ pg:
   backup:
     destination: s3://pg-backup
     type: minio
-    action: create
-  # gke install
-  # ...
+    action: restore
 
 mlflow:
   replicaCount: 1
@@ -16,7 +14,7 @@ mlflow:
     databaseConnectionCheck: true
     postgres:
       enabled: true
-      host: mlflow-rw
+      host: pg-mlflow-rw
       port: 5432
       database: db
       user: pguser
@@ -25,8 +23,7 @@ mlflow:
       proxiedArtifactStorage: true
       # local minio
       s3:
-        enabled: true
-        localPath: /Users/dmitry/Documents/ml-lab/mlflow/s3-data
+        enabled: false
         bucket: mlflow
         path: /
         awsAccessKeyId: awsAccessKeyId

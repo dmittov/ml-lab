@@ -1,0 +1,8 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: mlflow-backup
+  namespace: mlflow
+spec:
+  cluster:
+    name: pg-mlflow
