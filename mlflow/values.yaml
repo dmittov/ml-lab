@@ -1,0 +1,21 @@
+pg:
+  storage: 1Gi
+  gke:
+    serviceAccount: postgres-backup@ml-lab-324709.iam.gserviceaccount.com
+  backup:
+    destination: gs://ml-lab-324709-postgres
+    type: gke
+    serviceAccount: postgres-backup@ml-lab-324709.iam.gserviceaccount.com
+    action: restore
+
+mlflow:
+  replicaCount: 1
+  serviceAccount:
+    create: false
+    annotations:
+      iam.gke.io/gcp-service-account: mlflow@ml-lab-324709.iam.gserviceaccount.com
+  artifactRoot:
+      gcs:
+        enabled: true
+        bucket: ml-lab-324709-mlflow
+        path: /
