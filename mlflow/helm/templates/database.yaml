@@ -98,3 +98,5 @@ spec:
         retentionPolicy: "30d"
     storage:
         size: {{ .Values.pg.storage }}
+    monitoring:
+        enablePodMonitor: true
