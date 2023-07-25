@@ -1,0 +1,14 @@
+serviceAccount:
+  name: opencost
+  annotations: 
+    iam.gke.io/gcp-service-account: opencost@ml-lab-324709.iam.gserviceaccount.com
+
+opencost:
+  exporter:
+    cloudProviderApiKey: ""
+  prometheus:
+    external:
+      enabled: true
+      url: "http://prometheus-kube-prometheus-prometheus.prometheus:9090"
+    internal:
+      enabled: false
