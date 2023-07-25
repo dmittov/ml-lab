@@ -5,6 +5,8 @@ locals {
   apis         = [
     "container.googleapis.com",
     "cloudbuild.googleapis.com",
+    "cloudbilling.googleapis.com",
+    "apikeys.googleapis.com",
   ]
 }
 
@@ -50,6 +52,11 @@ resource "google_service_account" "mlflow" {
   display_name = "MLflow"
 }
 
+resource "google_service_account" "opencost" {
+  account_id   = "opencost"
+  display_name = "Service Account to access billing information"
+}
+
 resource "google_storage_bucket_iam_member" "postgres_admin" {
   bucket = data.terraform_remote_state.persistent.outputs.postgres_bucket
   role   = "roles/storage.admin"
@@ -61,6 +68,13 @@ resource "google_storage_bucket_iam_member" "mlflow" {
   role   = "roles/storage.admin"
   member = "serviceAccount:${google_service_account.mlflow.email}"
 }
+
+resource "google_billing_account_iam_member" "opencost" {
+  billing_account_id = "01E73B-E3CB37-2961B2"
+  role               = "roles/billing.viewer"
+  member             = "serviceAccount:${google_service_account.opencost.email}"
+}
+
 
 resource "google_container_cluster" "kube" {
   name = "dl-cluster"
