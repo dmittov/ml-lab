@@ -6,19 +6,19 @@ resource "google_bigquery_dataset" "house_pricing" {
   default_table_expiration_ms = 3600000
 }
 
-resource "google_bigquery_table" "house_features" {
+resource "google_bigquery_table" "house_area" {
   dataset_id          = google_bigquery_dataset.house_pricing.dataset_id
-  table_id            = "house_features"
+  table_id            = "house_area"
   deletion_protection = false
 
   time_partitioning {
-    type = "MONTH"
+    type = "HOUR"
     field = "house_valuation_timestamp"
   }
   schema = <<EOF
 [
   {"name": "house_id", "type": "STRING"},
-  {"name": "house_valuation_timestamp", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
+  {"name": "house_valuation_timestamp", "type": "TIMESTAMP"},
   {"name": "flr_one_sq_feet", "type": "INTEGER"},
   {"name": "flr_two_sq_feet", "type": "INTEGER"},
   {"name": "attributes", "type": "STRING", "mode": "REQUIRED"},
@@ -31,7 +31,7 @@ EOF
 
 resource "google_bigquery_table" "house_prices" {
   dataset_id          = google_bigquery_dataset.house_pricing.dataset_id
-  table_id            = "house_price"
+  table_id            = "house_prices"
   deletion_protection = false
 
   time_partitioning {
@@ -41,7 +41,7 @@ resource "google_bigquery_table" "house_prices" {
   schema = <<EOF
 [
   {"name": "house_id", "type": "STRING"},
-  {"name": "sale_timestamp", "type": "TIMESTAMP", "default": "CURRENT_TIMESTAMP"},
+  {"name": "sale_timestamp", "type": "TIMESTAMP"},
   {"name": "sale_price", "type": "INTEGER"},
   {"name": "attributes", "type": "STRING", "mode": "REQUIRED"},
   {"name": "subscription_name", "type": "STRING", "mode": "REQUIRED"},
@@ -51,9 +51,9 @@ resource "google_bigquery_table" "house_prices" {
 EOF
 }
 
-resource "google_bigquery_table" "ai_house_features" {
+resource "google_bigquery_table" "ai_house_area" {
   dataset_id          = google_bigquery_dataset.house_pricing.dataset_id
-  table_id            = "ai_house_features"
+  table_id            = "ai_house_area"
   deletion_protection = false
 
   view {
@@ -64,7 +64,7 @@ resource "google_bigquery_table" "ai_house_features" {
          flr_one_sq_feet,
          flr_two_sq_feet,
          (flr_one_sq_feet + flr_two_sq_feet) house_sq_feet
-  from ${google_bigquery_dataset.house_pricing.dataset_id}.${google_bigquery_table.house_features.table_id}
+  from ${google_bigquery_dataset.house_pricing.dataset_id}.${google_bigquery_table.house_area.table_id}
   ;
   EOF
   }

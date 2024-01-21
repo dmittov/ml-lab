@@ -1,7 +1,7 @@
-resource "google_pubsub_schema" "house_features" {
-  name       = "house_features"
+resource "google_pubsub_schema" "house_area" {
+  name       = "house_area"
   type       = "PROTOCOL_BUFFER"
-  definition = file("${path.module}/../../vertex/proto/house_features.proto")
+  definition = file("${path.module}/../../vertex/proto/house_area.proto")
 }
 
 resource "google_pubsub_schema" "house_prices" {
@@ -11,12 +11,12 @@ resource "google_pubsub_schema" "house_prices" {
 }
 
 
-resource "google_pubsub_topic" "house_features" {
-  name       = "house_features"
-  depends_on = [google_pubsub_schema.house_features]
+resource "google_pubsub_topic" "house_area" {
+  name       = "house_area"
+  depends_on = [google_pubsub_schema.house_area]
 
   schema_settings {
-    schema   = "projects/${google_bigquery_table.house_features.project}/schemas/house_features"
+    schema   = "projects/${google_bigquery_table.house_area.project}/schemas/house_area"
     encoding = "BINARY"
   }
 }
@@ -26,17 +26,17 @@ resource "google_pubsub_topic" "house_prices" {
   depends_on = [google_pubsub_schema.house_prices]
 
   schema_settings {
-    schema   = "projects/${google_bigquery_table.house_features.project}/schemas/house_prices"
+    schema   = "projects/${google_bigquery_table.house_prices.project}/schemas/house_prices"
     encoding = "BINARY"
   }
 }
 
-resource "google_pubsub_subscription" "house_features_bigquery" {
+resource "google_pubsub_subscription" "house_area_bigquery" {
   name  = "house_features_bigquery"
-  topic = google_pubsub_topic.house_features.name
+  topic = google_pubsub_topic.house_area.name
 
   bigquery_config {
-    table               = "${google_bigquery_table.house_features.project}.${google_bigquery_table.house_features.dataset_id}.${google_bigquery_table.house_features.table_id}"
+    table               = "${google_bigquery_table.house_area.project}.${google_bigquery_table.house_area.dataset_id}.${google_bigquery_table.house_area.table_id}"
     use_topic_schema    = true
     drop_unknown_fields = true
     write_metadata      = true
@@ -49,10 +49,10 @@ resource "google_pubsub_subscription" "house_features_bigquery" {
 
 resource "google_pubsub_subscription" "house_prices_bigquery" {
   name  = "house_prices_bigquery"
-  topic = google_pubsub_topic.house_features.name
+  topic = google_pubsub_topic.house_prices.name
 
   bigquery_config {
-    table               = "${google_bigquery_table.house_features.project}.${google_bigquery_table.house_features.dataset_id}.${google_bigquery_table.house_prices.table_id}"
+    table               = "${google_bigquery_table.house_prices.project}.${google_bigquery_table.house_prices.dataset_id}.${google_bigquery_table.house_prices.table_id}"
     use_topic_schema    = true
     drop_unknown_fields = true
     write_metadata      = true
