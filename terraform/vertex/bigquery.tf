@@ -79,10 +79,8 @@ resource "google_bigquery_table" "ai_house_prices" {
     use_legacy_sql = false
     query = <<EOF
   select house_id entity_id,
-         house_valuation_timestamp feature_timestamp,
-         flr_one_sq_feet,
-         flr_two_sq_feet,
-         (flr_one_sq_feet + flr_two_sq_feet) house_sq_feet
+         sale_timestamp feature_timestamp,
+         sale_price
   from ${google_bigquery_dataset.house_pricing.dataset_id}.${google_bigquery_table.house_prices.table_id}
   ;
   EOF

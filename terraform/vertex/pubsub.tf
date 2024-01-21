@@ -12,7 +12,7 @@ resource "google_pubsub_schema" "house_prices" {
 
 
 resource "google_pubsub_topic" "house_features" {
-  name       = "house_prices"
+  name       = "house_features"
   depends_on = [google_pubsub_schema.house_features]
 
   schema_settings {
