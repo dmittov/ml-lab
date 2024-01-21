@@ -1,9 +1,9 @@
-resource "google_vertex_ai_feature_group" "house_main" {
+resource "google_vertex_ai_feature_group" "house_area" {
   name = "house_main"
   description = "The main house feature group"
   big_query {
     big_query_source {
-        input_uri = "bq://${google_bigquery_table.house_features.project}.${google_bigquery_table.house_features.dataset_id}.${google_bigquery_table.house_features.table_id}"
+        input_uri = "bq://${google_bigquery_table.house_features.project}.${google_bigquery_table.house_features.dataset_id}.${google_bigquery_table.ai_house_features.table_id}"
     }
   }
 }
@@ -13,18 +13,7 @@ resource "google_vertex_ai_feature_group" "house_price" {
   description = "The house purchase events"
   big_query {
     big_query_source {
-        input_uri = "bq://${google_bigquery_table.house_features.project}.${google_bigquery_table.house_features.dataset_id}.${google_bigquery_table.house_features.table_id}"
-    }
-  }
-}
-
-
-resource "google_vertex_ai_feature_group" "house_eu_size" {
-  name = "house_eu_size"
-  description = "The house areas in sq meters"
-  big_query {
-    big_query_source {
-        input_uri = "bq://${google_bigquery_table.house_features.project}.${google_bigquery_table.house_features.dataset_id}.${google_bigquery_table.house_size_eu.table_id}"
+        input_uri = "bq://${google_bigquery_table.house_features.project}.${google_bigquery_table.house_features.dataset_id}.${google_bigquery_table.ai_house_prices.table_id}"
     }
   }
 }
