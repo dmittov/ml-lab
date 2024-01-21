@@ -5,7 +5,7 @@ resource "google_pubsub_schema" "house_features" {
 }
 
 resource "google_pubsub_schema" "house_prices" {
-  name       = "house_features"
+  name       = "house_prices"
   type       = "PROTOCOL_BUFFER"
   definition = file("${path.module}/../../vertex/proto/house_prices.proto")
 }
@@ -23,7 +23,7 @@ resource "google_pubsub_topic" "house_features" {
 
 resource "google_pubsub_topic" "house_prices" {
   name       = "house_prices"
-  depends_on = [google_pubsub_schema.house_features]
+  depends_on = [google_pubsub_schema.house_prices]
 
   schema_settings {
     schema   = "projects/${google_bigquery_table.house_features.project}/schemas/house_prices"
