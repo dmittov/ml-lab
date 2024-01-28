@@ -16,7 +16,7 @@ resource "google_pubsub_topic" "house_area" {
   depends_on = [google_pubsub_schema.house_area]
 
   schema_settings {
-    schema   = "projects/${google_bigquery_table.house_area.project}/schemas/house_area"
+    schema   = "projects/${google_pubsub_schema.house_area.project}/schemas/house_area"
     encoding = "BINARY"
   }
 }
@@ -26,7 +26,7 @@ resource "google_pubsub_topic" "house_prices" {
   depends_on = [google_pubsub_schema.house_prices]
 
   schema_settings {
-    schema   = "projects/${google_bigquery_table.house_prices.project}/schemas/house_prices"
+    schema   = "projects/${google_pubsub_schema.house_prices.project}/schemas/house_prices"
     encoding = "BINARY"
   }
 }
