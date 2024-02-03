@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message HouseArea {
+  string house_id = 1;
+  int64 house_valuation_timestamp = 2;
+  int64 flr_one_sq_feet = 3;
+  int64 flr_two_sq_feet = 4;
+}

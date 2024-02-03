@@ -1,6 +1,11 @@
 locals {
   cluster_zone = "${data.google_client_config.default.region}-${var.zone}"
-  gke_roles    = ["roles/editor", "roles/artifactregistry.reader"]
+  gke_roles    = [
+    "roles/editor", 
+    "roles/artifactregistry.reader",
+    "roles/bigquery.metadataViewer",
+    "roles/bigquery.dataEditor"
+  ]
   k8s_roles    = ["roles/storage.admin"]
   apis         = [
     "container.googleapis.com",
