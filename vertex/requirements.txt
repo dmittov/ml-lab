@@ -1,3 +1,0 @@
-google-cloud
-google-cloud-aiplatform
-sqlalchemy
